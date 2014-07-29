@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ChoregrapheBox xar_version="3">
+    <Box name="root" id="3" localization="8" tooltip="Enter tooltip here" x="250" y="84">
+        <bitmap>media/images/box/interaction/vocabulary.png</bitmap>
+        <script language="4">
+            <content>
+                <![CDATA[# This is a helper box that loads all python modules in the "lib" subfolder.
+
+import sys
+import os
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        self.modules = {}
+        behaviorPath = os.path.normpath(ALFrameManager.getBehaviorPath(self.behaviorId))
+        self.importPath = os.path.join(behaviorPath, "lib")
+        if self.importPath not in sys.path:
+            sys.path.insert(0, self.importPath)
+        for filename in os.listdir(self.importPath):
+            if filename.endswith(".py"):
+                moduleName = filename[:-3]
+                module = __import__(moduleName, globals=globals())
+                reload(module) # if the module was already present in the global namespace, reload it.
+                globals()[moduleName] = module
+                self.modules[moduleName] = module
+
+    def onUnload(self):
+        # Try to pretend the module was never loaded... provided it's mine!
+        while self.importPath in sys.path:
+            sys.path.remove(self.importPath)
+        for moduleName, module in self.modules.iteritems():
+            if sys.modules.get(moduleName, -1) is module:
+                del sys.modules[moduleName]
+                # Note that we do not delete globals()[moduleName]
+                # This way other boxes can still use them for cleanup in OnUnload(),
+                # but if someone imports a module of the same name again, it will replace
+                # this one (as inclusion in sys.modules is the criteria for reimpoort)
+
+    def onInput_onStart(self):
+        # This is necessary for the modules to be loaded.
+        pass]]>
+</content>
+        </script>
+        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="" id="2" />
+    </Box>
+</ChoregrapheBox>
