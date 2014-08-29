@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Folder expanded="no">
-    <Node name="Basic" />
-    <Node name="Animation" />
+    <Node name="WebSocket Connection" />
 </Folder>
