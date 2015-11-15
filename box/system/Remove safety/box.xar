@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ChoregrapheBox xar_version="3">
+    <Box name="root" id="1" localization="8" tooltip="This box contains a basic python script and can be used to create any python script box you would like.&#x0A;&#x0A;To edit its script, double-click on it." x="344" y="139">
+        <bitmap>media/images/box/box-python-script.png</bitmap>
+        <script language="4">
+            <content>
+                <![CDATA[import time
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        self.navigation = ALProxy("ALNavigation")
+        self.dcm = ALProxy("DCM")
+        self.battery = ALProxy("ALBattery")
+        self.autoMoves = ALProxy("ALAutonomousMoves")
+        self.motion = ALProxy("ALMotion")
+        self.bodytemp = ALProxy("ALBodyTemperature")
+        self.diagnosis = ALProxy("ALDiagnosis")
+
+    def onUnload(self):
+        pass
+
+    def onInput_onStart(self):
+        try:
+            self.log("Disabling Battery Power Monitoring")
+            self.battery.enablePowerMonitoring(False)
+        except Exception as e:
+            self.log("Error in disabling Battery Power Monitoring:\n%s" % e)
+
+        try:
+            self.log("Disabling Navigation Safety")
+            self.motion.setMotionConfig([["ENABLE_DEACTIVATION_OF_FALL_MANAGER", True]])
+            time.sleep(0.1)
+            self.motion.setExternalCollisionProtectionEnabled("All", False)
+            self.motion.setDiagnosisEffectEnabled(False)
+            self.autoMoves.setExpressiveListeningEnabled(False)
+            self.motion.setMoveArmsEnabled(False, False)
+            self.log("Navigation Safety Thread Disabled")
+        except Exception as e:
+            self.log("error : " + str(e))
+
+        try:
+            self.log("Disabling Notifications")
+            self.diagnosis.setEnableNotification(False)
+            self.bodytemp.setEnableNotifications(False)
+            self.motion.setEnableNotifications(False)
+        except Exception as e:
+            self.log("Error in disabling Notifications:\n%s" % e)
+
+        self.onStopped()
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]>
+</content>
+        </script>
+        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+        <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+    </Box>
+</ChoregrapheBox>

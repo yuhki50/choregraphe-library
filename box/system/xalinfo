@@ -2,4 +2,7 @@
 <Folder expanded="no">
     <Node name="Load libs" />
     <Node name="Disable Anti-Collision" />
+    <Node name="Remove safety" />
+    <Node name="Bench Mark" />
+    <Node name="Set Tablet Brightness" />
 </Folder>
